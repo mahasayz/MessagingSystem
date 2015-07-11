@@ -2,7 +2,7 @@ package com.epam.interviews;
 
 import java.util.concurrent.BlockingQueue;
 
-public class BlockingQueueMessenger {
+public class BlockingQueueMessenger implements Messenger {
 
 	BlockingQueue<Message> queue = null;
 	
@@ -10,6 +10,7 @@ public class BlockingQueueMessenger {
 		this.queue = queue;
 	}
 	
+	@Override
 	public void send (Message message) {
 		try {
 			queue.put(message);
@@ -19,6 +20,7 @@ public class BlockingQueueMessenger {
 		}
 	}
 	
+	@Override
 	public Message receive() {
 		Message message = null;
 		try {
