@@ -13,9 +13,9 @@ import org.junit.Test;
 public class TestCases {
 
 	private BlockingQueue<Message> queue;
-	private BlockingQueueMessenger messenger;
+	private Messenger messenger;
 	private static Logger logger = null;
-	
+
 	@Before
 	public void setUp() {
 		logger = Logger.getLogger(TestCases.class.getName());
@@ -23,11 +23,11 @@ public class TestCases {
 		queue = new ArrayBlockingQueue<Message>(1024);
 		messenger = new BlockingQueueMessenger(queue);
 	}
-	
+
 	@Test
 	public void stateCheck() {
 		logger.info("Testing Use Case 1: If queue is empty, what is state of consumer upon calling of receive");
-		new Thread( new Runnable() {
+		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -40,22 +40,22 @@ public class TestCases {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}).start();
-		
-		Thread consumer = new Thread( new Runnable() {
+
+		Thread consumer = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-					messenger.receive().getMessage().toString();
-					messenger.receive().getMessage().toString();
+				messenger.receive().getMessage().toString();
+				messenger.receive().getMessage().toString();
 			}
-			
+
 		});
-		
+
 		consumer.start();
-		
+
 		try {
 			Thread.sleep(2000);
 			assertEquals(Thread.State.WAITING, consumer.getState());
@@ -63,24 +63,42 @@ public class TestCases {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	@Test
 	public void queueSizeCheck() {
 		logger.info("Testing Use Case 2: Testing queue size after consumption of certain messages");
 		messenger.send(new TextMessage("Message1"));
 		messenger.send(new TextMessage("Message2"));
 		messenger.send(new TextMessage("Message3"));
-		
+
 		messenger.receive();
 		messenger.receive();
-		
+
 		assertEquals(1, queue.size());
 	}
-	
+
 	@After
 	public void cleanUp() {
 		queue.clear();
+		queue = null;
+	}
+
+	@Test
+	public void reEntrantTest() {
+		messenger = new ReentrantLockMessenger();
+		String message1 = "Message1";
+		String message2 = "Message2";
+		String message3 = "Message3";
+		logger.info("CHECKING messenger type : "
+				+ messenger.getClass().getName());
+		messenger.send(new TextMessage(message1));
+		messenger.send(new TextMessage(message2));
+		messenger.send(new TextMessage(message3));
+
+		assertEquals(message1, messenger.receive().getMessage().toString());
+		assertEquals(message2, messenger.receive().getMessage().toString());
+		assertEquals(message3, messenger.receive().getMessage().toString());
 	}
 }
