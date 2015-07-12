@@ -5,6 +5,14 @@ import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The re-entrant lock type implementation of a messaging system where a 
+ * <b>consumer/receiver</b> acquires a lock thereby preventing other threads from
+ * entering the block.
+ * 
+ * @author Mahbub
+ *
+ */
 public class ReentrantLockMessenger implements Messenger {
 
 	ReentrantLock lock = new ReentrantLock();
